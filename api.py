@@ -10,8 +10,8 @@ import os
 # ============================================================
 #  CONFIG
 # ============================================================
-DISCORD_TOKEN = "TON_TOKEN_DISCORD"
-MISTRAL_API_KEY = "TA_CLE_MISTRAL"
+DISCORD_TOKEN = "MTQ2ODY3MTA5NTgzNzE2MzY5MQ.GLDjFQ.2iKgBRrHjiw7hQLnu6w7IApr_JgihBT5Xzxb4Q"
+MISTRAL_API_KEY = "SGNfRLFbQXlP9I85Iin5CvF7WDLnqK5y"
 MODEL = "mistral-small-latest"
 # ============================================================
 
