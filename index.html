@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArcAI — Discord Server Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060810;
+  --bg2: #0d1117;
+  --bg3: #111827;
+  --border: rgba(99,102,241,0.2);
+  --accent: #6366f1;
+  --accent2: #8b5cf6;
+  --accent3: #06b6d4;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --success: #10b981;
+  --error: #ef4444;
+  --warn: #f59e0b;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Animated bg ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(139,92,246,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Grid bg ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative; z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 6rem;
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+  padding: 4rem 0 3rem;
+  animation: fadeDown 0.8s ease both;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.logo-icon {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 0 30px rgba(99,102,241,0.4);
+}
+
+.logo-text {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a5b4fc, #c4b5fd, #67e8f9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+header p {
+  color: var(--muted);
+  font-size: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* ── Steps ── */
+.steps {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+
+.step {
+  flex: 1;
+  height: 3px;
+  background: var(--bg3);
+  border-radius: 99px;
+  transition: background 0.4s;
+  position: relative;
+}
+.step.active { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.step.done   { background: var(--success); }
+
+/* ── Cards ── */
+.card {
+  background: rgba(13,17,23,0.8);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(12px);
+  animation: fadeUp 0.8s 0.2s ease both;
+  transition: border-color 0.3s;
+}
+.card:hover { border-color: rgba(99,102,241,0.4); }
+
+.card-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.card-title::before {
+  content: '';
+  width: 3px; height: 14px;
+  background: var(--accent3);
+  border-radius: 99px;
+}
+
+/* ── Form elements ── */
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+}
+
+input[type="text"] {
+  width: 100%;
+  background: rgba(6,8,16,0.6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+input[type="text"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+input[type="text"]::placeholder { color: var(--muted); }
+
+/* ── Size grid ── */
+.size-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.size-card {
+  background: rgba(6,8,16,0.5);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.size-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.size-card.selected {
+  border-color: var(--accent);
+  background: rgba(99,102,241,0.12);
+  box-shadow: 0 0 20px rgba(99,102,241,0.2);
+}
+
+.size-card .size-emoji { font-size: 1.5rem; margin-bottom: 0.3rem; }
+.size-card .size-label { font-weight: 700; font-size: 0.95rem; }
+.size-card .size-desc  { font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 0.2rem; }
+
+/* ── Separator grid ── */
+.sep-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.sep-btn {
+  background: rgba(6,8,16,0.5);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.sep-btn:hover { border-color: var(--accent); }
+.sep-btn.selected {
+  border-color: var(--accent2);
+  background: rgba(139,92,246,0.15);
+  color: #c4b5fd;
+}
+
+/* ── Language select ── */
+.lang-grid {
+  display: flex; gap: 0.6rem; flex-wrap: wrap;
+}
+.lang-btn {
+  background: rgba(6,8,16,0.5);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: all 0.2s;
+}
+.lang-btn:hover { border-color: var(--accent); }
+.lang-btn.selected {
+  border-color: var(--accent3);
+  background: rgba(6,182,212,0.12);
+  color: #67e8f9;
+}
+
+/* ── Guild ID input section ── */
+.guild-section {
+  display: flex; gap: 0.75rem; align-items: flex-end;
+}
+.guild-section input { flex: 1; }
+
+.check-btn {
+  background: rgba(99,102,241,0.15);
+  border: 1.5px solid rgba(99,102,241,0.4);
+  border-radius: 10px;
+  padding: 0.85rem 1.2rem;
+  color: #a5b4fc;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.check-btn:hover {
+  background: rgba(99,102,241,0.25);
+  border-color: var(--accent);
+}
+
+.guild-status {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  display: none;
+}
+.guild-status.ok  { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; display: block; }
+.guild-status.err { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; display: block; }
+
+/* ── Help box ── */
+.help-box {
+  background: rgba(6,182,212,0.07);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.7;
+  margin-top: 1rem;
+}
+.help-box strong { color: #67e8f9; }
+.help-box a { color: #a5b4fc; }
+
+/* ── Generate button ── */
+.generate-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 14px;
+  padding: 1.1rem 2rem;
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 30px rgba(99,102,241,0.35);
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+.generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(99,102,241,0.5);
+}
+.generate-btn:disabled {
+  opacity: 0.5; cursor: not-allowed; transform: none;
+}
+
+/* ── Progress ── */
+#progress-section {
+  display: none;
+  animation: fadeUp 0.5s ease both;
+}
+
+.progress-log {
+  background: rgba(6,8,16,0.8);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 2;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.log-line { display: flex; align-items: center; gap: 0.5rem; animation: fadeLeft 0.3s ease both; }
+.log-line.done  { color: var(--success); }
+.log-line.info  { color: #a5b4fc; }
+.log-line.warn  { color: var(--warn); }
+.log-line.error { color: var(--error); }
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(99,102,241,0.3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Result ── */
+#result-section {
+  display: none;
+  animation: fadeUp 0.5s ease both;
+}
+
+.result-card {
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 18px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.result-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #6ee7b7, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.result-stats {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.stat-pill {
+  background: rgba(16,185,129,0.12);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 99px;
+  padding: 0.4rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #6ee7b7;
+}
+
+.reset-btn {
+  background: transparent;
+  border: 1.5px solid rgba(16,185,129,0.4);
+  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  color: #6ee7b7;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reset-btn:hover { background: rgba(16,185,129,0.1); }
+
+/* ── Invite banner ── */
+.invite-banner {
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+
+.invite-banner .invite-icon { font-size: 1.5rem; }
+.invite-banner p { font-size: 0.85rem; color: #94a3b8; flex: 1; line-height: 1.5; }
+.invite-banner a {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.invite-banner a:hover { opacity: 0.85; }
+
+/* ── Animations ── */
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: none; } }
+@keyframes fadeLeft { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+@keyframes spin     { to { transform: rotate(360deg); } }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 99px; }
+
+@media (max-width: 600px) {
+  .size-grid { grid-template-columns: 1fr 1fr; }
+  .guild-section { flex-direction: column; }
+  .check-btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🤖</div>
+      <span class="logo-text">ArcAI</span>
+    </div>
+    <p>// discord server builder — powered by mistral ai</p>
+  </header>
+
+  <!-- Steps bar -->
+  <div class="steps">
+    <div class="step active" id="step-1"></div>
+    <div class="step" id="step-2"></div>
+    <div class="step" id="step-3"></div>
+  </div>
+
+  <!-- Main form -->
+  <div id="form-section">
+
+    <!-- Thème -->
+    <div class="card">
+      <div class="card-title">01 — Thème du serveur</div>
+      <label>Décris le thème</label>
+      <input type="text" id="theme" placeholder="gaming, crypto, anime, étude, musique..." />
+    </div>
+
+    <!-- Taille -->
+    <div class="card">
+      <div class="card-title">02 — Taille du serveur</div>
+      <div class="size-grid">
+        <div class="size-card" data-size="small" onclick="selectSize(this)">
+          <div class="size-emoji">🟢</div>
+          <div class="size-label">Petit</div>
+          <div class="size-desc">5 cat · 20 salons · 5 rôles</div>
+        </div>
+        <div class="size-card selected" data-size="medium" onclick="selectSize(this)">
+          <div class="size-emoji">🟡</div>
+          <div class="size-label">Moyen</div>
+          <div class="size-desc">10 cat · 50 salons · 15 rôles</div>
+        </div>
+        <div class="size-card" data-size="large" onclick="selectSize(this)">
+          <div class="size-emoji">🟠</div>
+          <div class="size-label">Grand</div>
+          <div class="size-desc">20 cat · 100 salons · 30 rôles</div>
+        </div>
+        <div class="size-card" data-size="mega" onclick="selectSize(this)">
+          <div class="size-emoji">🔴</div>
+          <div class="size-label">Mega</div>
+          <div class="size-desc">30 cat · 150 salons · 50 rôles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Séparateur -->
+    <div class="card">
+      <div class="card-title">03 — Séparateur emoji/nom</div>
+      <div class="sep-grid">
+        <div class="sep-btn selected" data-sep="dot"     onclick="selectSep(this)">💬・general</div>
+        <div class="sep-btn"          data-sep="bar"     onclick="selectSep(this)">💬┃general</div>
+        <div class="sep-btn"          data-sep="arrow"   onclick="selectSep(this)">💬»general</div>
+        <div class="sep-btn"          data-sep="bullet"  onclick="selectSep(this)">💬•general</div>
+        <div class="sep-btn"          data-sep="pipe"    onclick="selectSep(this)">💬|general</div>
+        <div class="sep-btn"          data-sep="star"    onclick="selectSep(this)">💬✦general</div>
+        <div class="sep-btn"          data-sep="diamond" onclick="selectSep(this)">💬◈general</div>
+        <div class="sep-btn"          data-sep="none"    onclick="selectSep(this)">💬-general</div>
+      </div>
+    </div>
+
+    <!-- Langue -->
+    <div class="card">
+      <div class="card-title">04 — Langue</div>
+      <div class="lang-grid">
+        <div class="lang-btn selected" data-lang="fr" onclick="selectLang(this)">🇫🇷 Français</div>
+        <div class="lang-btn"          data-lang="en" onclick="selectLang(this)">🇬🇧 English</div>
+        <div class="lang-btn"          data-lang="es" onclick="selectLang(this)">🇪🇸 Español</div>
+        <div class="lang-btn"          data-lang="de" onclick="selectLang(this)">🇩🇪 Deutsch</div>
+        <div class="lang-btn"          data-lang="pt" onclick="selectLang(this)">🇧🇷 Português</div>
+      </div>
+    </div>
+
+    <!-- Invite + Guild ID -->
+    <div class="invite-banner">
+      <span class="invite-icon">🔗</span>
+      <p>Le bot doit être sur ton serveur avant de générer.<br>
+         <strong>Assure-toi aussi qu'il a le rôle le plus haut !</strong></p>
+      <a href="https://discord.com/api/oauth2/authorize?client_id=TON_CLIENT_ID&permissions=8&scope=bot%20applications.commands" target="_blank">Inviter ArcAI</a>
+    </div>
+
+    <div class="card">
+      <div class="card-title">05 — ID du serveur Discord</div>
+      <div class="guild-section">
+        <input type="text" id="guild-id" placeholder="ex: 1234567890123456789" />
+        <button class="check-btn" onclick="checkBot()">Vérifier</button>
+      </div>
+      <div class="guild-status" id="guild-status"></div>
+      <div class="help-box">
+        <strong>Comment trouver l'ID ?</strong><br>
+        Discord → Paramètres → Apparence → Active <strong>Mode développeur</strong><br>
+        Puis clic droit sur ton serveur → <strong>Copier l'identifiant</strong>
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <button class="generate-btn" id="gen-btn" onclick="generate()">
+      <span>⚡</span> Générer le serveur
+    </button>
+
+  </div>
+
+  <!-- Progress -->
+  <div id="progress-section">
+    <div class="card">
+      <div class="card-title">Construction en cours...</div>
+      <div class="progress-log" id="progress-log"></div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result-section">
+    <div class="result-card">
+      <div style="font-size:3rem;margin-bottom:1rem">🎉</div>
+      <div class="result-title" id="result-name">Serveur créé !</div>
+      <p style="color:var(--muted);font-size:0.9rem">Ton serveur Discord a été généré avec succès.</p>
+      <div class="result-stats" id="result-stats"></div>
+      <button class="reset-btn" onclick="resetForm()">← Créer un autre serveur</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "http://localhost:5000/api";
+
+let selectedSize = "medium";
+let selectedSep  = "dot";
+let selectedLang = "fr";
+
+function selectSize(el) {
+  document.querySelectorAll('.size-card').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSize = el.dataset.size;
+  updateStep(1);
+}
+
+function selectSep(el) {
+  document.querySelectorAll('.sep-btn').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSep = el.dataset.sep;
+}
+
+function selectLang(el) {
+  document.querySelectorAll('.lang-btn').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedLang = el.dataset.lang;
+}
+
+function updateStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const s = document.getElementById(`step-${i}`);
+    s.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+}
+
+async function checkBot() {
+  const guildId = document.getElementById('guild-id').value.trim();
+  const status  = document.getElementById('guild-status');
+  if (!guildId) { status.className = 'guild-status err'; status.textContent = '❌ Entre un ID de serveur'; return; }
+
+  status.className = 'guild-status info'; status.style.display = 'block';
+  status.textContent = '⏳ Vérification...';
+
+  try {
+    const r = await fetch(`${API}/check-bot`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ guild_id: guildId })
+    });
+    const d = await r.json();
+    if (d.present) {
+      status.className = 'guild-status ok';
+      status.textContent = `✅ Bot trouvé sur "${d.name}" (${d.members} membres)`;
+      updateStep(2);
+    } else {
+      status.className = 'guild-status err';
+      status.textContent = `❌ Bot absent du serveur. Invites-le d'abord !`;
+    }
+  } catch(e) {
+    status.className = 'guild-status err';
+    status.textContent = '❌ Impossible de contacter l\'API. Lance api.py d\'abord.';
+  }
+}
+
+function addLog(text, type = 'info') {
+  const log = document.getElementById('progress-log');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+
+  const icon = type === 'done' ? '✅' : type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '›';
+
+  if (type === 'info') {
+    line.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
+  } else {
+    line.innerHTML = `<span>${icon}</span><span>${text}</span>`;
+  }
+
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function generate() {
+  const theme   = document.getElementById('theme').value.trim();
+  const guildId = document.getElementById('guild-id').value.trim();
+
+  if (!theme)   { alert('Entre un thème !'); return; }
+  if (!guildId) { alert('Entre l\'ID du serveur !'); return; }
+
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('progress-section').style.display = 'block';
+  document.getElementById('progress-log').innerHTML = '';
+  updateStep(3);
+
+  addLog('Connexion à Mistral AI...', 'info');
+
+  try {
+    const r = await fetch(`${API}/generate`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        theme, language: selectedLang,
+        size: selectedSize, separator: selectedSep,
+        guild_id: guildId
+      })
+    });
+
+    const d = await r.json();
+
+    // Affiche les logs du serveur
+    if (d.logs) {
+      document.getElementById('progress-log').innerHTML = '';
+      for (const log of d.logs) {
+        const type = log.includes('✅') ? 'done' : log.includes('❌') ? 'error' : log.includes('⚠️') ? 'warn' : 'info';
+        addLog(log, type);
+        await new Promise(res => setTimeout(res, 80));
+      }
+    }
+
+    if (d.success) {
+      setTimeout(() => showResult(d), 800);
+    } else {
+      addLog(`Erreur : ${d.error}`, 'error');
+    }
+  } catch(e) {
+    addLog('❌ Impossible de contacter l\'API. Lance api.py d\'abord !', 'error');
+  }
+}
+
+function showResult(d) {
+  document.getElementById('progress-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'block';
+  document.getElementById('result-name').textContent = `✅ ${d.server_name || 'Serveur'} créé !`;
+
+  const stats = document.getElementById('result-stats');
+  stats.innerHTML = `
+    <div class="stat-pill">📁 ${d.stats?.categories || 0} catégories</div>
+    <div class="stat-pill">💬 ${d.stats?.channels || 0} salons</div>
+    <div class="stat-pill">👥 ${d.stats?.roles || 0} rôles</div>
+  `;
+}
+
+function resetForm() {
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('progress-log').innerHTML = '';
+  updateStep(1);
+}
+</script>
+</body>
+</html>
