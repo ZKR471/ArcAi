@@ -10,7 +10,7 @@ import os
 # ============================================================
 #  CONFIG
 # ============================================================
-DISCORD_TOKEN = "MTQ2ODY3MTA5NTgzNzE2MzY5MQ.GLDjFQ.2iKgBRrHjiw7hQLnu6w7IApr_JgihBT5Xzxb4Q"
+DISCORD_TOKEN = ""
 MISTRAL_API_KEY = "SGNfRLFbQXlP9I85Iin5CvF7WDLnqK5y"
 MODEL = "mistral-small-latest"
 # ============================================================
